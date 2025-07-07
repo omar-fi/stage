@@ -1,0 +1,6 @@
+/* src/pages/HomePage.css */
+.home-background {
+  background-image: url('/Modele-de-facture.webp');
+  background-size: cover;
+  background-position: center;
+}
