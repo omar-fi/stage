@@ -1,9 +1,11 @@
 // src/pages/Auth/Login.jsx
 import React, { useState } from 'react';
 import './AuthPage.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Routes } from 'react-router-dom';
 
 export default function Login() {
+
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,6 +33,7 @@ export default function Login() {
       console.log(data);
 
      if (data.role === "ADMIN") {
+    
   navigate('/admin');
 } else if (data.role === "AGENT") {
   navigate('/agent');
