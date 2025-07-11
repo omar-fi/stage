@@ -1,5 +1,6 @@
 import React from 'react';
 import './HomePage.css';
+import { Link } from 'react-router-dom';
 
 export default function HomePage() {
   return (
@@ -8,14 +9,13 @@ export default function HomePage() {
         <div className="flex items-center space-x-3">
           <img src="/logo-anp.jpeg" alt="Logo ANP" className="h-10" />
           <h1 className="text-xl font-bold">Plateforme ANP</h1>
-        </div>
-        <div className="space-x-4">
-          <a href="/login" className="bg-white text-[#0071bc] px-4 py-2 rounded font-semibold hover:bg-gray-100">
-            Connexion
-          </a>
-          <a href="/register" className="border border-white px-4 py-2 rounded hover:bg-white hover:text-[#0071bc]">
-            Inscription
-          </a>
+        </div><div className="space-x-4">
+          <Link to="/login" className="bg-white text-[#0071bc] px-4 py-2 rounded font-semibold hover:bg-gray-100">
+          Connexion
+          </Link>
+          <Link to="/register" className="border border-white px-4 py-2 rounded hover:bg-white hover:text-[#0071bc]">
+          Inscription
+          </Link>
         </div>
       </header>
 

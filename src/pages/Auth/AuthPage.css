@@ -1,0 +1,10 @@
+/* src/pages/AuthPage.css */
+.auth-background {
+  background-image: url('/Modele-de-facture.webp');
+  background-size: cover;
+  background-position: center;
+}
+
+.auth-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
