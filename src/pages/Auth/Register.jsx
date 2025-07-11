@@ -6,7 +6,7 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [raisonSociale, setRaisonSociale] = useState('');
-  const [ICE, setICE] = useState('');
+  const [ice, setICE] = useState('');
   const [portDemande, setPortDemande] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,7 +31,7 @@ export default function Register() {
       fullName,
       email,
       raisonSociale,
-      ICE,
+      ice,
       portDemande,
       password 
     };
@@ -88,7 +88,7 @@ export default function Register() {
   <label>ICE</label>
   <input
     type="text"
-    value={ICE}
+    value={ice}
     onChange={(e) => {
       const value = e.target.value;
       // Garde uniquement les chiffres
