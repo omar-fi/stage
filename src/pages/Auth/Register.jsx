@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom';
 export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
+  const [raisonSociale, setRaisonSociale] = useState('');
+  const [ICE, setICE] = useState('');
+  const [portDemande, setPortDemande] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showRules, setShowRules] = useState(false);
@@ -28,22 +30,24 @@ export default function Register() {
     const payload = {
       fullName,
       email,
-      company,
-      password
+      raisonSociale,
+      ICE,
+      portDemande,
+      password 
     };
 
     try {
-      const response = await fetch('http://localhost:8080/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      const response = await fetch('http://localhost:8080/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payload)
+});
 
       if (response.ok) {
         alert("Inscription réussie !");
-        // Redirection ou nettoyage des champs si besoin
+        
       } else {
         const data = await response.json();
         setError(data.message || "Erreur lors de l'inscription.");
@@ -77,8 +81,34 @@ export default function Register() {
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
           </div>
           <div>
-            <label>Société maritime</label>
-            <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
+            <label>Raison sociale</label>
+            <input type="text" value={raisonSociale} onChange={(e) => setRaisonSociale(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
+          </div>
+          <div>
+  <label>ICE</label>
+  <input
+    type="text"
+    value={ICE}
+    onChange={(e) => {
+      const value = e.target.value;
+      // Garde uniquement les chiffres
+      const numericValue = value.replace(/\D/g, '');
+      // Limite à 15 chiffres
+      if (numericValue.length <= 15) {
+        setICE(numericValue);
+      }
+    }}
+    className="w-full px-4 py-2 rounded bg-white text-black"
+    required
+    inputMode="numeric"
+    pattern="\d*"
+    placeholder="Ex : 123456789012345"
+  />
+</div>
+
+          <div>
+            <label>Port demandé</label>
+            <input type="text" value={portDemande} onChange={(e) => setPortDemande(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
           </div>
           <div>
             <label>Mot de passe</label>
@@ -91,7 +121,6 @@ export default function Register() {
               className="w-full px-4 py-2 rounded bg-white text-black"
               required
             />
-
             {showRules && (
               <div className="text-sm mt-2 space-y-1 bg-white bg-opacity-10 p-3 rounded">
                 <Rule condition={password.length >= 8} text="8 caractères minimum" />
@@ -101,7 +130,6 @@ export default function Register() {
                 <Rule condition={/[^A-Za-z\d]/.test(password)} text="Un caractère spécial" />
               </div>
             )}
-
             {error && <p className="text-red-300 text-sm mt-2">{error}</p>}
           </div>
           <button type="submit" className="w-full bg-[#0071bc] hover:bg-blue-700 py-2 rounded text-white font-semibold">
