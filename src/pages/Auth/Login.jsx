@@ -14,7 +14,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
+      const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,12 +30,15 @@ export default function Login() {
       const data = await response.json();
       console.log(data);
 
-      // Redirection en fonction du rôle
-      if (data.includes("Admin")) {
-        navigate('/admin');
-      } else if (data.includes("Taxateur")) {
-        navigate('/taxateur');
-      }
+     if (data.role === "ADMIN") {
+  navigate('/admin');
+} else if (data.role === "AGENT") {
+  navigate('/agent');
+} else if (data.role === "TAXATEUR") {
+  navigate('/taxateur');
+} else {
+  setError("Rôle inconnu ou accès refusé");
+}
 
     } catch (err) {
       setError(err.message || 'Erreur de connexion');
