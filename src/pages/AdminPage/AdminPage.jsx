@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PortManagement from './PortManagement'; 
 
-// Remplace cette URL par celle de ton backend
+
 const API_URL = 'http://localhost:8080/admin/agents-inscrits';
 
 function AgentTable({ agents, onAccept, onReject }) {
@@ -52,7 +53,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Charger les agents inscrits depuis l’API
+
   useEffect(() => {
     if (menu === 'agents') {
       setLoading(true);
@@ -65,7 +66,7 @@ export default function AdminPage() {
     }
   }, [menu]);
 
-  // Accepter un agent
+
   const handleAccept = (id) => {
     fetch(`${API_URL}/${id}/accepter`, { method: 'POST' })
       .then(res => {
@@ -75,7 +76,7 @@ export default function AdminPage() {
       });
   };
 
-  // Rejeter un agent
+
   const handleReject = (id) => {
     fetch(`${API_URL}/${id}`, { method: 'DELETE' })
       .then(res => {
@@ -85,14 +86,14 @@ export default function AdminPage() {
       });
   };
 
-  // Déconnexion simple
+
   const handleLogout = () => {
     navigate('/login');
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
+      
       <aside className="w-64 bg-[#0071bc] text-white flex flex-col py-8 px-4 shadow-lg justify-between">
         <div>
           <div className="mb-8 flex items-center space-x-3">
@@ -112,6 +113,12 @@ export default function AdminPage() {
             >
               Agent inscrit
             </button>
+            <button
+              className={`text-left px-4 py-2 rounded hover:bg-[#005fa3] ${menu === 'port' ? 'bg-[#005fa3]' : ''}`}
+              onClick={() => setMenu('port')}
+            >
+              Port
+            </button>
           </nav>
         </div>
         <button
@@ -122,7 +129,7 @@ export default function AdminPage() {
         </button>
       </aside>
 
-      {/* Main content */}
+      
       <main className="flex-1 p-10">
         {menu === 'dashboard' && (
           <div>
@@ -139,6 +146,9 @@ export default function AdminPage() {
               <AgentTable agents={agents} onAccept={handleAccept} onReject={handleReject} />
             )}
           </div>
+        )}
+        {menu === 'port' && (
+          <PortManagement />
         )}
       </main>
     </div>

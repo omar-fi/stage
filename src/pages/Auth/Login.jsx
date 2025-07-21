@@ -1,4 +1,4 @@
-// src/pages/Auth/Login.jsx
+
 import React, { useState } from 'react';
 import './AuthPage.css';
 import { useNavigate, Link, Routes } from 'react-router-dom';
