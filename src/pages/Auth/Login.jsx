@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './AuthPage.css';
 import { useNavigate, Link, Routes } from 'react-router-dom';
-
+import Swal from 'sweetalert2';
 export default function Login() {
 
   
@@ -31,20 +31,34 @@ export default function Login() {
 
       const data = await response.json();
       console.log(data);
-
+        Swal.fire({
+              title: "Succès",
+              text: "Connexion réussie !",
+              icon: "success",
+              draggable: true
+          });
      if (data.role === "ADMIN") {
-    
   navigate('/admin');
 } else if (data.role === "AGENT") {
   navigate('/agent');
 } else if (data.role === "TAXATEUR") {
   navigate('/taxateur');
 } else {
-  setError("Rôle inconnu ou accès refusé");
+  Swal.fire({
+  icon: "error",
+  title: "Oops...",
+  text: "Something went wrong!",
+  footer: '<a href="#">Why do I have this issue?</a>'
+});
 }
 
     } catch (err) {
-      setError(err.message || 'Erreur de connexion');
+      Swal.fire({
+  icon: "error",
+  title: "Email ou mot de passe incorrect",
+  text: "Veuillez vérifier vos informations d'identification.",
+
+});
     }
   };
 

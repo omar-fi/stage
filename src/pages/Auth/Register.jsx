@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './AuthPage.css';
+import Swal from 'sweetalert2';
+
 import { Link } from 'react-router-dom';
 
 export default function Register() {
-  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [raisonSociale, setRaisonSociale] = useState('');
   const [ice, setICE] = useState('');
@@ -28,7 +29,6 @@ export default function Register() {
     setError('');
 
     const payload = {
-      fullName,
       email,
       raisonSociale,
       ice,
@@ -46,11 +46,19 @@ export default function Register() {
 });
 
       if (response.ok) {
-        alert("Inscription réussie !");
+        Swal.fire({
+        title: "Succès",
+        text: "Inscription réussie !",
+        icon: "success",
+        draggable: true
+    });
         
       } else {
-        const data = await response.json();
-        setError(data.message || "Erreur lors de l'inscription.");
+        Swal.fire({
+  title: "Erreur",
+  text: "Une erreur s'est produite lors de l'inscription.",
+  icon: "question"
+});
       }
     } catch (err) {
       setError("Erreur réseau ou serveur !");
@@ -72,10 +80,6 @@ export default function Register() {
         </div>
         <h2 className="text-3xl font-bold text-center mb-6 text-[#0071bc]">Inscription</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label>Nom complet</label>
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
-          </div>
           <div>
             <label>Email professionnel</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />

@@ -11,8 +11,7 @@ function AgentTable({ agents, onAccept, onReject }) {
       <table className="min-w-full bg-white text-black rounded shadow">
         <thead>
           <tr>
-            <th className="py-2 px-4 border-b">ID</th>
-            <th className="py-2 px-4 border-b">Nom</th>
+            <th className="py-2 px-4 border-b">ID</th>          
             <th className="py-2 px-4 border-b">Email</th>
             <th className="py-2 px-4 border-b">Société</th>
             <th className="py-2 px-4 border-b">Actions</th>
@@ -22,7 +21,6 @@ function AgentTable({ agents, onAccept, onReject }) {
         {agents.map(agent => (
   <tr key={agent.id} className="hover:bg-gray-100">
     <td className="py-2 px-4 border-b">{agent.id}</td>
-    <td className="py-2 px-4 border-b">{agent.fullName}</td>
     <td className="py-2 px-4 border-b">{agent.email}</td>
     <td className="py-2 px-4 border-b">{agent.raisonSociale}</td>
     <td className="py-2 px-4 border-b flex gap-2">
