@@ -81,13 +81,14 @@ export default function Register() {
         <h2 className="text-3xl font-bold text-center mb-6 text-[#0071bc]">Inscription</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label>Email professionnel</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
-          </div>
-          <div>
             <label>Raison sociale</label>
             <input type="text" value={raisonSociale} onChange={(e) => setRaisonSociale(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
           </div>
+          <div>
+            <label>Email professionnel</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
+          </div>
+         
           <div>
   <label>ICE</label>
   <input

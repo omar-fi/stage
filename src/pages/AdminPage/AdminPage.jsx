@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PortManagement from './PortManagement'; 
+import TarifSpecifiqueManagement from './TarifSpecifiqueManagement';
+import TarifStandardManagement from './TarifStandardManagement';
 
 
 const API_URL = 'http://localhost:8080/admin/agents-inscrits';
@@ -117,6 +119,18 @@ export default function AdminPage() {
             >
               Port
             </button>
+            <button
+              className={`text-left px-4 py-2 rounded hover:bg-[#005fa3] ${menu === 'tarifSpecifique' ? 'bg-[#005fa3]' : ''}`}
+              onClick={() => setMenu('tarifSpecifique')}
+            >
+              Tarifs spécifique
+            </button>
+            <button
+              className={`text-left px-4 py-2 rounded hover:bg-[#005fa3] ${menu === 'tarifStandard' ? 'bg-[#005fa3]' : ''}`}
+              onClick={() => setMenu('tarifStandard')}
+            >
+              Tarifs standard
+            </button>
           </nav>
         </div>
         <button
@@ -147,6 +161,12 @@ export default function AdminPage() {
         )}
         {menu === 'port' && (
           <PortManagement />
+        )}
+        {menu === 'tarifSpecifique' && (
+          <TarifSpecifiqueManagement />
+        )}
+        {menu === 'tarifStandard' && (
+          <TarifStandardManagement />
         )}
       </main>
     </div>

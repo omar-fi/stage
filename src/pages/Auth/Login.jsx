@@ -30,13 +30,7 @@ export default function Login() {
       }
 
       const data = await response.json();
-      console.log(data);
-        Swal.fire({
-              title: "Succès",
-              text: "Connexion réussie !",
-              icon: "success",
-              draggable: true
-          });
+     
      if (data.role === "ADMIN") {
   navigate('/admin');
 } else if (data.role === "AGENT") {
@@ -44,12 +38,7 @@ export default function Login() {
 } else if (data.role === "TAXATEUR") {
   navigate('/taxateur');
 } else {
-  Swal.fire({
-  icon: "error",
-  title: "Oops...",
-  text: "Something went wrong!",
-  footer: '<a href="#">Why do I have this issue?</a>'
-});
+  alert("Rôle inconnu");
 }
 
     } catch (err) {
