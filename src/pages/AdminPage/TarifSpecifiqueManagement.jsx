@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 const API_URL = 'http://localhost:8080/admin/tarifs-specifiques';
 const PORTS_API_URL = 'http://localhost:8080/admin/ports';
+const CATEGORIES_API_URL = 'http://localhost:8080/admin/categories';
 
-function TarifForm({ tarif, onSave, onCancel, ports }) {
+function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
   const [formData, setFormData] = useState({
     portId: tarif ? tarif.portId : '',
     categorie: tarif ? tarif.categorie : '',
@@ -11,6 +12,18 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
     unite: tarif ? tarif.unite : '',
     tarifUnitaire: tarif ? tarif.tarifUnitaire : ''
   });
+
+  // Remplissage automatique libelle/unite
+  const handleCategorieChange = (e) => {
+    const selectedId = e.target.value;
+    const selectedCat = categories.find(cat => String(cat.id) === String(selectedId));
+    setFormData(prev => ({
+      ...prev,
+      categorie: selectedId,
+      libelle: selectedCat ? selectedCat.libelle : '',
+      unite: selectedCat ? selectedCat.unite : ''
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,14 +58,18 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Catégorie</label>
-          <input
-            type="text"
+          <select
             name="categorie"
             value={formData.categorie}
-            onChange={handleChange}
+            onChange={handleCategorieChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
-          />
+          >
+            <option value="">Sélectionner une catégorie</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.libelle}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Libellé</label>
@@ -63,6 +80,7 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
+            readOnly
           />
         </div>
         <div>
@@ -74,6 +92,7 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
+            readOnly
           />
         </div>
         <div>
@@ -103,6 +122,7 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
 export default function TarifSpecifiqueManagement() {
   const [tarifs, setTarifs] = useState([]);
   const [ports, setPorts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingTarif, setEditingTarif] = useState(null);
@@ -110,6 +130,7 @@ export default function TarifSpecifiqueManagement() {
   useEffect(() => {
     fetchTarifs();
     fetchPorts();
+    fetchCategories();
   }, []);
 
   const fetchPorts = () => {
@@ -117,6 +138,13 @@ export default function TarifSpecifiqueManagement() {
       .then(res => res.json())
       .then(data => setPorts(data))
       .catch(error => console.error("Erreur de chargement des ports:", error));
+  };
+
+  const fetchCategories = () => {
+    fetch(CATEGORIES_API_URL)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(error => console.error("Erreur de chargement des catégories:", error));
   };
 
   const fetchTarifs = () => {
@@ -196,7 +224,7 @@ export default function TarifSpecifiqueManagement() {
         )}
       </div>
 
-      {isFormVisible && <TarifForm tarif={editingTarif} onSave={handleSave} onCancel={handleCancel} ports={ports} />}
+      {isFormVisible && <TarifForm tarif={editingTarif} onSave={handleSave} onCancel={handleCancel} ports={ports} categories={categories} />}
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white text-black rounded shadow">

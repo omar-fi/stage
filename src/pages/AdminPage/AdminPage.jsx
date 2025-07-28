@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PortManagement from './PortManagement'; 
 import TarifSpecifiqueManagement from './TarifSpecifiqueManagement';
 import TarifStandardManagement from './TarifStandardManagement';
+import CategoriesManagement from './CategoriesManagement';
 
 
 const API_URL = 'http://localhost:8080/admin/agents-inscrits';
@@ -131,6 +132,12 @@ export default function AdminPage() {
             >
               Tarifs standard
             </button>
+             <button
+              className={`text-left px-4 py-2 rounded hover:bg-[#005fa3] ${menu === 'categories' ? 'bg-[#005fa3]' : ''}`}
+              onClick={() => setMenu('categories')}
+            >
+              Categories
+            </button>
           </nav>
         </div>
         <button
@@ -167,6 +174,9 @@ export default function AdminPage() {
         )}
         {menu === 'tarifStandard' && (
           <TarifStandardManagement />
+        )}
+         {menu === 'categories' && (
+          <CategoriesManagement />
         )}
       </main>
     </div>
