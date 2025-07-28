@@ -48,17 +48,22 @@ function TarifForm({ tarif, onSave, onCancel, ports }) {
             required
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Unité</label>
-          <input
-            type="text"
-            name="unite"
-            value={formData.unite}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-            required
-          />
-        </div>
+       <div>
+  <label className="block text-sm font-medium text-gray-700">Unité</label>
+  <select
+    name="unite"
+    value={formData.unite}
+    onChange={handleChange}
+    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+    required
+  >
+    <option value="">-- Choisir une unité --</option>
+    <option value="m3">m³</option>
+    <option value="Tonne">Tonne</option>
+    <option value="Unité">Unité</option>
+  </select>
+</div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Tarif Unitaire</label>
           <input
@@ -185,7 +190,7 @@ export default function TarifStandardManagement() {
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">ID</th>
+              
               <th className="py-2 px-4 border-b">Catégorie</th>
               <th className="py-2 px-4 border-b">Libellé</th>
               <th className="py-2 px-4 border-b">Unité</th>
@@ -196,7 +201,6 @@ export default function TarifStandardManagement() {
           <tbody>
             {tarifs.map(tarif => (
               <tr key={tarif.id} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b text-center">{tarif.id}</td>
                 <td className="py-2 px-4 border-b">{tarif.categorie}</td>
                 <td className="py-2 px-4 border-b">{tarif.libelle}</td>
                 <td className="py-2 px-4 border-b">{tarif.unite}</td>

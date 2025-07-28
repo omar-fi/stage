@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AuthPage.css';
 import Swal from 'sweetalert2';
-
 import { Link } from 'react-router-dom';
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [raisonSociale, setRaisonSociale] = useState('');
   const [ice, setICE] = useState('');
-  const [portDemande, setPortDemande] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Nouveau champ de confirmation du mot de passe
+  const [portId, setPortId] = useState('');
+  const [ports, setPorts] = useState([]);
+  const [role, setRole] = useState('AGENT'); // Le rôle par défaut est un AGENT
   const [error, setError] = useState('');
   const [showRules, setShowRules] = useState(false);
+
+  // Charger les ports depuis l'API
+  useEffect(() => {
+    fetch('http://localhost:8080/admin/ports')
+      .then(res => res.json())
+      .then(data => setPorts(data))
+      .catch(err => console.error('Erreur lors du chargement des ports :', err));
+  }, []);
 
   const validatePassword = (pwd) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/;
@@ -21,44 +31,57 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Vérification des mots de passe
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    // Validation du mot de passe
     if (!validatePassword(password)) {
       setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
       return;
     }
 
-    setError('');
+    setError(''); // Réinitialisation de l'erreur
 
     const payload = {
       email,
       raisonSociale,
       ice,
-      portDemande,
-      password 
+      password,
+      role,
+      portId: role === 'TAXATEUR' ? portId : null, // Si c'est un taxateur, on envoie le portId
     };
 
     try {
       const response = await fetch('http://localhost:8080/register', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-});
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
       if (response.ok) {
         Swal.fire({
-        title: "Succès",
-        text: "Inscription réussie !",
-        icon: "success",
-        draggable: true
-    });
-        
+          title: "Succès",
+          text: "Inscription enregistrée ! En attente de validation.",
+          icon: "success"
+        });
+        setEmail('');
+        setRaisonSociale('');
+        setICE('');
+        setPassword('');
+        setConfirmPassword('');
+        setPortId('');
+        setRole('AGENT'); // Réinitialisation du rôle à AGENT après l'inscription
       } else {
         Swal.fire({
-  title: "Erreur",
-  text: "Une erreur s'est produite lors de l'inscription.",
-  icon: "question"
-});
+          title: "Erreur",
+          text: "Une erreur s'est produite lors de l'inscription.",
+          icon: "error"
+        });
       }
     } catch (err) {
       setError("Erreur réseau ou serveur !");
@@ -79,42 +102,34 @@ export default function Register() {
           <img src="/logo-anp.jpeg" alt="Logo ANP" className="h-16" />
         </div>
         <h2 className="text-3xl font-bold text-center mb-6 text-[#0071bc]">Inscription</h2>
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label>Raison sociale</label>
             <input type="text" value={raisonSociale} onChange={(e) => setRaisonSociale(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
           </div>
+
           <div>
             <label>Email professionnel</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
           </div>
-         
-          <div>
-  <label>ICE</label>
-  <input
-    type="text"
-    value={ice}
-    onChange={(e) => {
-      const value = e.target.value;
-      // Garde uniquement les chiffres
-      const numericValue = value.replace(/\D/g, '');
-      // Limite à 15 chiffres
-      if (numericValue.length <= 15) {
-        setICE(numericValue);
-      }
-    }}
-    className="w-full px-4 py-2 rounded bg-white text-black"
-    required
-    inputMode="numeric"
-    pattern="\d*"
-    placeholder="Ex : 123456789012345"
-  />
-</div>
 
           <div>
-            <label>Port demandé</label>
-            <input type="text" value={portDemande} onChange={(e) => setPortDemande(e.target.value)} className="w-full px-4 py-2 rounded bg-white text-black" required />
+            <label>ICE</label>
+            <input
+              type="text"
+              value={ice}
+              onChange={(e) => {
+                const numericValue = e.target.value.replace(/\D/g, '');
+                if (numericValue.length <= 15) setICE(numericValue);
+              }}
+              className="w-full px-4 py-2 rounded bg-white text-black"
+              required
+              inputMode="numeric"
+              placeholder="Ex : 123456789012345"
+            />
           </div>
+
           <div>
             <label>Mot de passe</label>
             <input
@@ -135,12 +150,29 @@ export default function Register() {
                 <Rule condition={/[^A-Za-z\d]/.test(password)} text="Un caractère spécial" />
               </div>
             )}
-            {error && <p className="text-red-300 text-sm mt-2">{error}</p>}
           </div>
+
+          <div>
+            <label>Confirmer le mot de passe</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 rounded bg-white text-black"
+              required
+            />
+          </div>
+
+         
+
+
+          {error && <p className="text-red-300 text-sm mt-2">{error}</p>}
+
           <button type="submit" className="w-full bg-[#0071bc] hover:bg-blue-700 py-2 rounded text-white font-semibold">
             S'inscrire
           </button>
         </form>
+
         <p className="text-center mt-4">
           Déjà inscrit ? <Link to="/login" className="text-[#0071bc] underline">Connexion</Link>
         </p>
