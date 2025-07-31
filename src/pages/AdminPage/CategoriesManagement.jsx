@@ -6,7 +6,8 @@ function CategoryForm({ category, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     libelle: category ? category.libelle : '',
     unite: category ? category.unite : '',
-    categorie: category ? category.categorie : ''
+    categorie: category ? category.categorie : '',
+    groupName : category ? category.groupName : ''
   });
 
   const handleChange = (e) => {
@@ -36,14 +37,18 @@ function CategoryForm({ category, onSave, onCancel }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Unité</label>
-          <input
-            type="text"
+          <select
             name="unite"
             value={formData.unite}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
-          />
+          >
+            <option value="">-- Choisir une unité --</option>
+            <option value="m3">m³</option>
+            <option value="Tonne">Tonne</option>
+            <option value="Unité">Unité</option>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Catégorie </label>
@@ -51,6 +56,17 @@ function CategoryForm({ category, onSave, onCancel }) {
             type="number"
             name="categorie"
             value={formData.categorie}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Groupe </label>
+          <input
+            type="text"
+            name="groupName"
+            value={formData.groupName}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
@@ -162,20 +178,20 @@ export default function CategoriesManagement() {
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">ID</th>
               <th className="py-2 px-4 border-b">Libellé</th>
               <th className="py-2 px-4 border-b">Unité</th>
               <th className="py-2 px-4 border-b">Catégorie </th>
+              <th className="py-2 px-4 border-b">Groupe </th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
             {categories.map(category => (
               <tr key={category.id} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b text-center">{category.id}</td>
                 <td className="py-2 px-4 border-b">{category.libelle}</td>
                 <td className="py-2 px-4 border-b">{category.unite}</td>
                 <td className="py-2 px-4 border-b text-center">{category.categorie}</td>
+                <td className="py-2 px-4 border-b text-center">{category.groupName}</td>
                 <td className="py-2 px-4 border-b text-center flex gap-2 justify-center">
                   <button
                     onClick={() => handleEdit(category)}

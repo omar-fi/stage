@@ -10,7 +10,8 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
     categorie: tarif ? tarif.categorie : '',
     libelle: tarif ? tarif.libelle : '',
     unite: tarif ? tarif.unite : '',
-    tarifUnitaire: tarif ? tarif.tarifUnitaire : ''
+    tarifUnitaire: tarif ? tarif.tarifUnitaire : '' ,
+    groupName: tarif ? tarif.groupName : ''
   });
 
   // Remplissage automatique libelle/unite
@@ -21,7 +22,8 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
       ...prev,
       categorie: selectedId,
       libelle: selectedCat ? selectedCat.libelle : '',
-      unite: selectedCat ? selectedCat.unite : ''
+      unite: selectedCat ? selectedCat.unite : '',
+      groupName: selectedCat ? selectedCat.groupName : ''
     }));
   };
 
@@ -77,6 +79,18 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
             type="text"
             name="libelle"
             value={formData.libelle}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            required
+            readOnly
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Groupe</label>
+          <input
+            type="text"
+            name="groupName"
+            value={formData.groupName}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
@@ -229,10 +243,10 @@ export default function TarifSpecifiqueManagement() {
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
-            <tr>
-              <th className="py-2 px-4 border-b">ID</th>
-              <th className="py-2 px-4 border-b">Port ID</th>
+            <tr> 
               <th className="py-2 px-4 border-b">Catégorie</th>
+              <th className="py-2 px-4 border-b">Groupe</th>
+              <th className="py-2 px-4 border-b">Port</th>
               <th className="py-2 px-4 border-b">Libellé</th>
               <th className="py-2 px-4 border-b">Unité</th>
               <th className="py-2 px-4 border-b">Tarif Unitaire</th>
@@ -241,12 +255,14 @@ export default function TarifSpecifiqueManagement() {
           </thead>
           <tbody>
             {tarifs.map(tarif => (
-              <tr key={tarif.id} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b text-center">{tarif.id}</td>
-                <td className="py-2 px-4 border-b">{tarif.portId}</td>
-                <td className="py-2 px-4 border-b">{tarif.categorie}</td>
+              <tr key={tarif.id} className="hover:bg-gray-100">   
+                <td className="py-2 px-4 border-b text-center">{tarif.categorie}</td>
+                <td className="py-2 px-4 border-b ">{tarif.groupName}</td>
+                <td className="py-2 px-4 border-b">
+                  {ports.find(p => p.id === tarif.portId)?.nom || "Tous les ports"}
+                </td>
                 <td className="py-2 px-4 border-b">{tarif.libelle}</td>
-                <td className="py-2 px-4 border-b">{tarif.unite}</td>
+                <td className="py-2 px-4 border-b text-center">{tarif.unite}</td>
                 <td className="py-2 px-4 border-b text-center">{tarif.tarifUnitaire}</td>
                 <td className="py-2 px-4 border-b text-center flex gap-2 justify-center">
                   <button
