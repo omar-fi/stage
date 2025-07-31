@@ -23,7 +23,18 @@ function CategoryForm({ category, onSave, onCancel }) {
   return (
     <div className="bg-white p-6 rounded shadow-md mb-6">
       <h3 className="text-xl font-bold mb-4">{category ? 'Modifier la Catégorie' : 'Ajouter une Catégorie'}</h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4"
+      > <div>
+          <label className="block text-sm font-medium text-gray-700">Catégorie </label>
+          <input
+            type="number"
+            name="categorie"
+            value={formData.categorie}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            required
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Libellé</label>
           <input
@@ -50,17 +61,7 @@ function CategoryForm({ category, onSave, onCancel }) {
             <option value="Unité">Unité</option>
           </select>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Catégorie </label>
-          <input
-            type="number"
-            name="categorie"
-            value={formData.categorie}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-            required
-          />
-        </div>
+       
         <div>
           <label className="block text-sm font-medium text-gray-700">Groupe </label>
           <input
@@ -177,10 +178,10 @@ export default function CategoriesManagement() {
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
-            <tr>
+            <tr>  
+              <th className="py-2 px-4 border-b">Catégorie </th>
               <th className="py-2 px-4 border-b">Libellé</th>
               <th className="py-2 px-4 border-b">Unité</th>
-              <th className="py-2 px-4 border-b">Catégorie </th>
               <th className="py-2 px-4 border-b">Groupe </th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
@@ -188,9 +189,9 @@ export default function CategoriesManagement() {
           <tbody>
             {categories.map(category => (
               <tr key={category.id} className="hover:bg-gray-100">
+                <td className="py-2 px-4 border-b text-center">{category.categorie}</td>
                 <td className="py-2 px-4 border-b">{category.libelle}</td>
                 <td className="py-2 px-4 border-b">{category.unite}</td>
-                <td className="py-2 px-4 border-b text-center">{category.categorie}</td>
                 <td className="py-2 px-4 border-b text-center">{category.groupName}</td>
                 <td className="py-2 px-4 border-b text-center flex gap-2 justify-center">
                   <button

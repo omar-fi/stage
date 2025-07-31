@@ -69,7 +69,7 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
           >
             <option value="">Sélectionner une catégorie</option>
             {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.libelle}</option>
+              <option key={cat.id} value={cat.id}>{cat.categorie}</option>
             ))}
           </select>
         </div>
@@ -256,7 +256,11 @@ export default function TarifSpecifiqueManagement() {
           <tbody>
             {tarifs.map(tarif => (
               <tr key={tarif.id} className="hover:bg-gray-100">   
-                <td className="py-2 px-4 border-b text-center">{tarif.categorie}</td>
+                <td className="py-2 px-4 border-b text-center">
+                  {
+                    categories.find(cat => String(cat.id) === String(tarif.categorie))?.categorie || tarif.categorie
+                  }
+                </td>
                 <td className="py-2 px-4 border-b ">{tarif.groupName}</td>
                 <td className="py-2 px-4 border-b">
                   {ports.find(p => p.id === tarif.portId)?.nom || "Tous les ports"}
@@ -285,4 +289,4 @@ export default function TarifSpecifiqueManagement() {
       </div>
     </div>
   );
-} 
+}

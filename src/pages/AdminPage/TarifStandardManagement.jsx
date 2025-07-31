@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const API_URL = 'http://localhost:8080/admin/tarifs-standards';
 const PORTS_API_URL = 'http://localhost:8080/admin/ports';
 const CATEGORIES_API_URL = 'http://localhost:8080/admin/categories';
+const TARIFS_ISPS_API_URL = 'http://localhost:8080/admin/tarifs-isps';
 
 function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
   const [formData, setFormData] = useState({
@@ -11,7 +12,8 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
     libelle: tarif ? tarif.libelle : '',
     unite: tarif ? tarif.unite : '',
     tarifUnitaire: tarif ? tarif.tarifUnitaire : '',
-    groupName: tarif ? tarif.groupName : ''
+    groupName: tarif ? tarif.groupName : '',
+    tarifsIsps: tarif ? tarif.tarifsIsps : ''
   });
 
   // Remplissage automatique libelle/unite
@@ -52,12 +54,12 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
           >
             <option value="">Sélectionner une catégorie</option>
             {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.libelle}</option>
+              <option key={cat.id} value={cat.id}>{cat.categorie}</option>
             ))}
           </select>
         </div>
-          <div>
-          <label className="block text-sm font-medium text-gray-700">Groupe </label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Groupe</label>
           <input
             type="text"
             name="groupName"
@@ -101,7 +103,21 @@ function TarifForm({ tarif, onSave, onCancel, ports, categories }) {
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             required
+            step="0.01"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Tarifs ISPS</label>
+          <input
+            type="number"
+            name="tarifsIsps"
+            value={formData.tarifsIsps}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            step="0.01"
+            readOnly
+          />
+          
         </div>
         <div className="flex justify-end gap-4">
           <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
@@ -227,24 +243,37 @@ export default function TarifStandardManagement() {
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
             <tr>
-              
               <th className="py-2 px-4 border-b">Catégorie</th>
               <th className="py-2 px-4 border-b">Groupe</th>
               <th className="py-2 px-4 border-b">Libellé</th>
               <th className="py-2 px-4 border-b">Unité</th>
               <th className="py-2 px-4 border-b">Tarif Unitaire</th>
+              <th className="py-2 px-4 border-b">Tarifs ISPS</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>  
           <tbody>
             {tarifs.map(tarif => (
               <tr key={tarif.id} className="hover:bg-gray-100">
-                
-                <td className="py-2 px-4 border-b text-center">{tarif.categorie}</td>
+                <td className="py-2 px-4 border-b text-center">
+                {
+                categories.find(cat => String(cat.id) === String(tarif.categorie))?.categorie || tarif.categorie
+                }
+</td>
                 <td className="py-2 px-4 border-b">{tarif.groupName}</td>
                 <td className="py-2 px-4 border-b">{tarif.libelle}</td>
                 <td className="py-2 px-4 border-b text-center">{tarif.unite}</td>
                 <td className="py-2 px-4 border-b text-center">{tarif.tarifUnitaire}</td>
+                <td className="py-2 px-4 border-b text-center">
+                  <span className={`px-2 py-1 rounded text-sm font-medium ${
+                    tarif.tarifsIsps === 0 
+                      ? 'text-center' 
+                      : 'text-center'
+                  }`}>
+                    {tarif.tarifsIsps !== null && tarif.tarifsIsps !== undefined ? tarif.tarifsIsps : 'N/A'}
+                  </span>
+                 
+                </td>
                 <td className="py-2 px-4 border-b text-center flex gap-2 justify-center">
                   <button
                     onClick={() => handleEdit(tarif)}
@@ -266,4 +295,4 @@ export default function TarifStandardManagement() {
       </div>
     </div>
   );
-} 
+}
