@@ -163,17 +163,15 @@ export default function PortManagement() {
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">ID</th>
               <th className="py-2 px-4 border-b">Nom</th>
               <th className="py-2 px-4 border-b">Ville</th>
-              <th className="py-2 px-4 border-b">Taux RK (%)</th>
+              <th className="py-2 px-4 border-b">Taxe Rg(%)</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
             {ports.map(port => (
               <tr key={port.id} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b text-center">{port.id}</td>
                 <td className="py-2 px-4 border-b">{port.nom}</td>
                 <td className="py-2 px-4 border-b">{port.ville}</td>
                 <td className="py-2 px-4 border-b text-center">{port.tauxRK}</td>

@@ -138,7 +138,6 @@ export default function UserManagement() {
         <table className="min-w-full bg-white text-black rounded shadow">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">ID</th>
               <th className="py-2 px-4 border-b">Email</th>
               <th className="py-2 px-4 border-b">Rôle</th>
               <th className="py-2 px-4 border-b">Port</th>
@@ -148,7 +147,6 @@ export default function UserManagement() {
           <tbody>
             {filteredUsers.map(user => (
               <tr key={user.id} className="hover:bg-gray-100 text-center">
-                <td className="py-2 px-4 border-b">{user.id}</td>
                 <td className="py-2 px-4 border-b">{user.email}</td>
                 <td className="py-2 px-4 border-b">
   {user.role === 'AGENT' ? 'AGENT MARITIME' : user.role}
