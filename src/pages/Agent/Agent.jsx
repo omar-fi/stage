@@ -77,7 +77,7 @@ export default function AgentPage() {
   const chargerManifests = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/agent/manifests/${agentId}`);
+      const response = await fetch(`http://localhost:8080/api/manifest`);
       if (response.ok) {
         const data = await response.json();
         setManifests(data);
@@ -290,7 +290,7 @@ export default function AgentPage() {
               className={`text-left px-4 py-2 rounded hover:bg-[#005fa3] transition-colors ${menu === 'profil' ? 'bg-[#005fa3]' : ''}`}
               onClick={() => setMenu('profil')}
             >
-              �� Profil
+                 Profil
             </button>
           </nav>
         </div>
@@ -308,7 +308,7 @@ export default function AgentPage() {
           <div>
             {/* Welcome Section */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Bonjour, Agent Portuaire ! ��</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Bonjour, Agent Portuaire !   </h2>
               <p className="text-gray-600">Voici un aperçu de vos activités aujourd'hui</p>
             </div>
 
@@ -673,21 +673,31 @@ export default function AgentPage() {
                             {getStatusText(manifest.statut)}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-600 space-y-1">
-                          <p>📅 Date de dépôt: {formatDate(manifest.dateDepotManifest)}</p>
-                          <p>🏠 Port: {manifest.port?.nom || 'N/A'}</p>
-                          <p>🚢 Trafic: {manifest.trafic || 'N/A'}</p>
-                          {manifest.montantTotal && (
-                            <p className="font-medium text-green-600">
-                              �� Montant: {manifest.montantTotal.toLocaleString()} DH
-                            </p>
-                          )}
-                          {manifest.commentairesTraitement && (
-                            <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                              💬 {manifest.commentairesTraitement}
-                            </p>
-                          )}
-                        </div>
+                     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      {manifests.map((manifest) => (
+        <div
+          key={manifest.id}
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "12px",
+            marginBottom: "16px",
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <p>📋 Manifest #{manifest.id}</p>
+          <p>
+             Date de dépôt:{" "}
+            {manifest.dateDepot
+              ? new Date(manifest.dateDepot).toLocaleString()
+              : "N/A"}
+          </p>
+          <p> Port: {manifest.port || "N/A"}</p>
+          <p> Trafic: {manifest.trafic || "N/A"}</p>
+          <p> Navire: {manifest.navire || "N/A"}</p>
+        </div>
+      ))}
+    </div>
                       </div>
                     ))}
                   </div>
@@ -739,12 +749,12 @@ export default function AgentPage() {
          
        {menu === 'profil' && (
   <div>
-    <h2 className="text-2xl font-bold text-[#0071bc] mb-6">�� Profil Agent</h2>
+    <h2 className="text-2xl font-bold text-[#0071bc] mb-6">   Profil Agent</h2>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       
       
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">�� Modifier le mot de passe</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">   Modifier le mot de passe</h3>
         
         <form className="space-y-4">
           <div>
@@ -788,7 +798,7 @@ export default function AgentPage() {
             type="submit"
             className="w-full bg-[#0071bc] text-white px-6 py-3 rounded-lg hover:bg-[#005fa3] transition-colors font-medium"
           >
-            �� Modifier le mot de passe
+               Modifier le mot de passe
           </button>
         </form>
 

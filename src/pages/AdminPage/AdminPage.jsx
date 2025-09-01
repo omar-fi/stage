@@ -196,7 +196,7 @@ export default function AdminPage() {
       <main className="ml-64 p-10">
         {menu === 'dashboard' && (
           <div>
-            <h1 className="text-3xl font-bold text-[#0071bc] mb-6">Bienvenue sur le Dashboard Admin</h1>
+            <h1 className="text-3xl font-bold text-[#0071bc] mb-6">Bienvenue Omar!</h1>
             
             {/* Statistiques */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

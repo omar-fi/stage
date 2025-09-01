@@ -11,18 +11,20 @@ export default function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // ... existing code ...
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/login', {
+      const response = await fetch('http://localhost:8080/api/auth/login', {  // ← CORRECTION ICI
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
+// ... existing code ...
 
       if (!response.ok) {
         const errorText = await response.text();

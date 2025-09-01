@@ -202,8 +202,14 @@ export default function TaxateurPage() {
             {manifestsEnAttente.map((manifest) => (
               <tr key={manifest.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{manifest.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(manifest.dateDepotManifest)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.port?.nom || 'N/A'}</td>
+             
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+  {formatDate(manifest.dateDepot)} {/* au lieu de manifest.dateDepotManifest */}
+</td>
+<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+  {manifest.port} {/* au lieu de manifest.port?.nom */}
+</td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.trafic || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.createdBy || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -276,22 +282,7 @@ export default function TaxateurPage() {
       </aside>
 
       <main className="ml-64 p-10">
-        <div className="mb-4 p-3 bg-yellow-100 border border-yellow-300 rounded">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-yellow-800">
-              <strong>Debug:</strong> Manifests en attente: {debugInfo.manifestsEnAttente || 0} | 
-              Manifests traités: {debugInfo.manifestsTraites || 0} | 
-              Dernière mise à jour: {debugInfo.lastUpdate || 'Jamais'}
-            </div>
-            <button 
-              onClick={testAPI}
-              className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600"
-            >
-              Test API
-            </button>
-          </div>
-        </div>
-
+        
         {menu === 'dashboard' && (
           <div>
             <h1 className="text-3xl font-bold text-[#0071bc] mb-6">Bienvenue sur le Dashboard Taxateur</h1>
