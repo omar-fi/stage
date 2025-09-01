@@ -736,41 +736,75 @@ export default function AgentPage() {
             </div>
           </div>
         )}
-
-        {menu === 'profil' && (
+         
+       {menu === 'profil' && (
+  <div>
+    <h2 className="text-2xl font-bold text-[#0071bc] mb-6">�� Profil Agent</h2>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">�� Modifier le mot de passe</h3>
+        
+        <form className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#0071bc] mb-6">�� Profil Agent</h2>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
-                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" defaultValue="Agent Portuaire" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input type="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" defaultValue="agent@anp.ma" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
-                  <input type="tel" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" defaultValue="+212 5XX XX XX XX" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Port assigné</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option>Port de Casablanca</option>
-                    <option>Port de Tanger</option>
-                    <option>Port d'Agadir</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mt-6">
-                <button className="bg-[#0071bc] text-white px-6 py-2 rounded hover:bg-[#005fa3] transition-colors">
-                  💾 Sauvegarder les modifications
-                </button>
-              </div>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Mot de passe actuel
+            </label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
           </div>
-        )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nouveau mot de passe
+            </label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+              minLength={6}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Le mot de passe doit contenir au moins 6 caractères
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirmer le nouveau mot de passe
+            </label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-[#0071bc] text-white px-6 py-3 rounded-lg hover:bg-[#005fa3] transition-colors font-medium"
+          >
+            �� Modifier le mot de passe
+          </button>
+        </form>
+
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-900 mb-2">💡 Conseils de sécurité</h4>
+          <ul className="text-sm text-blue-800 space-y-1">
+            <li>• Utilisez au moins 8 caractères</li>
+            <li>• Incluez des lettres majuscules et minuscules</li>
+            <li>• Ajoutez des chiffres et des symboles</li>
+            <li>• Évitez les informations personnelles</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </main>
     </div>
   );
