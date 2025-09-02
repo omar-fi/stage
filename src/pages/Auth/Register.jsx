@@ -18,54 +18,50 @@ export default function Register() {
     return regex.test(pwd);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!validatePassword(password)) {
-      setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
-      return;
-    }
+  // Validations simples
+  if (!email || !raisonSociale || !ice || !password) {
+    setError("Tous les champs sont obligatoires.");
+    return;
+  }
+  if (!validatePassword(password)) {
+    setError("Le mot de passe doit respecter les règles.");
+    return;
+  }
 
-    setError('');
+  setError('');
 
-    const payload = {
-      email,
-      raisonSociale,
-      ice,
-      portDemande,
-      password 
-    };
-
-    try {
-      const response = await fetch('http://localhost:8080/register', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-});
-
-      if (response.ok) {
-        Swal.fire({
-        title: "Succès",
-        text: "Inscription réussie !",
-        icon: "success",
-        draggable: true
-    });
-        
-      } else {
-        Swal.fire({
-  title: "Erreur",
-  text: "Une erreur s'est produite lors de l'inscription.",
-  icon: "question"
-});
-      }
-    } catch (err) {
-      setError("Erreur réseau ou serveur !");
-    }
+  // Si tu n'as que le libellé du port, tu dois obtenir son ID avant d'envoyer.
+  // Exemple: const portId = selectedPort?.id || null;
+  const portId = null; // remplace par l'ID réel si disponible
+  const payload = {
+    email,
+    raisonSociale,
+    ice: Number(ice),      // si le backend attend un nombre (Long)
+    password,
+    portId                 // et non "portDemande"
   };
 
-  const Rule = ({ condition, text }) => (
+  try {
+    const response = await fetch('http://localhost:8080/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await response.text(); // utile pour voir "ICE manquant" etc.
+
+    if (response.ok) {
+      Swal.fire({ title: "Succès", text: "Inscription réussie !", icon: "success" });
+    } else {
+      Swal.fire({ title: "Erreur", text: text || "Erreur lors de l'inscription.", icon: "error" });
+    }
+  } catch (err) {
+    setError("Erreur réseau ou serveur !");
+  }
+};  const Rule = ({ condition, text }) => (
     <p className={`flex justify-between items-center px-2 py-1 rounded ${condition ? 'text-green-400' : 'text-gray-300'}`}>
       <span>{text}</span>
       {condition && <span className="text-green-400 text-lg">✅</span>}
