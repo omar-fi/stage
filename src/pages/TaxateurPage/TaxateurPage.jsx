@@ -184,48 +184,46 @@ export default function TaxateurPage() {
     if (!manifestsEnAttente || manifestsEnAttente.length === 0) {
       return <p className="text-gray-500 text-center py-4">Aucun manifest en attente</p>;
     }
+return (
+  <div className="overflow-x-auto">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date dépôt</th>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Port</th>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Escale</th>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Navire</th>
+          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Trafic</th>
+          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
 
-    return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date dépôt</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trafic</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé par</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {manifestsEnAttente.map((manifest) => (
-              <tr key={manifest.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{manifest.id}</td>
-             
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-  {formatDate(manifest.dateDepot)} {/* au lieu de manifest.dateDepotManifest */}
-</td>
-<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-  {manifest.port} {/* au lieu de manifest.port?.nom */}
-</td>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {manifestsEnAttente.map((manifest) => (
+          <tr key={manifest.id} className="hover:bg-gray-50">
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">#{manifest.id}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{formatDate(manifest.dateDepot)}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{manifest.port || 'N/A'}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{manifest.escaleId || 'N/A'}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{manifest.navire || 'N/A'}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{manifest.trafic || 'N/A'}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+              <button
+                onClick={() => ouvrirModalTraitement(manifest)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+              >
+                Traiter
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.trafic || 'N/A'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.createdBy || 'N/A'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    onClick={() => ouvrirModalTraitement(manifest)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                  >
-                    Traiter
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+
   };
 
   const renderManifestsTraites = () => {
