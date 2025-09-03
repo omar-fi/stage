@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function TaxateurPage() {
-  const [menu, setMenu] = useState('manifest');
+  const [menu, setMenu] = useState('dashboard');
   const [manifestsEnAttente, setManifestsEnAttente] = useState([]);
   const [manifestsTraites, setManifestsTraites] = useState([]);
   const [factures, setFactures] = useState([]);
@@ -16,9 +16,93 @@ export default function TaxateurPage() {
     commentaires: '',
     lignes: []
   });
-
   const [agentsEscale, setAgentsEscale] = useState([]);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
+  const [showFacturePreview, setShowFacturePreview] = useState(false);
+  const [factureHTML, setFactureHTML] = useState('');
+    // Génération du HTML de la facture au format ANP
+    const imprimerFacture = () => {
+      if (!selectedManifest || !selectedAgentId) {
+        alert("Veuillez sélectionner un manifest et un agent.");
+        return;
+      }
+      setShowTraitementModal(false); // Fermer la modal dès qu'on affiche la facture
+      const agent = agentsEscale.find(a => a.id === selectedAgentId) || {};
+      const lignes = selectedManifest.manifestLines || [];
+      let totalHT = 0;
+      let totalTVA = 0;
+      let totalTR = 0;
+      const tauxTVA = 20;
+      const rows = lignes.map((l, idx) => {
+        const tarif = traitementData.lignes[idx]?.tarifUnitaire || 0;
+        const quantite = l.quantite || 1;
+        const montantHT = quantite * tarif;
+        const tva = montantHT * tauxTVA / 100;
+        totalHT += montantHT;
+        totalTVA += tva;
+        return `<tr>
+          <td>${l.code || ''}</td>
+          <td>${l.description || 'Marchandise'}</td>
+          <td>${quantite}</td>
+          <td>${l.unite || ''}</td>
+          <td>${tarif.toFixed(2)}</td>
+          <td>${montantHT.toFixed(2)}</td>
+          <td>${tauxTVA}</td>
+          <td>${tva.toFixed(2)}</td>
+          <td>${l.ancienIndex || ''}</td>
+          <td>${l.nouvelIndex || ''}</td>
+        </tr>`;
+      }).join('');
+      const totalTTC = totalHT + totalTVA + totalTR;
+      const html = `
+        <div style="font-family: Arial, sans-serif; margin: 40px;">
+          <div style="text-align: center;">
+            <div>ROYAUME DU MAROC<br>AGENCE NATIONALE DES PORTS</div>
+            <img src='/logo-anp.jpeg' style="height: 50px; margin-bottom: 10px;" alt="ANP" />
+          </div>
+          <div style="margin-bottom: 10px;"><strong>Port :</strong> ${selectedManifest.port || 'N/A'}</div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Date d'Emission</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Statut Facture</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Méthode de Paiement</th>
+            </tr>
+            <tr>
+            <td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${new Date().toLocaleString('fr-FR')}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">Réglée</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">Espèce</td>
+            </tr>
+          </table>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Code Client</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Nom Client</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">ICE</th>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.id || 'N/A'}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.raisonSociale || agent.email || `Agent #${selectedAgentId}`}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.ice || 'N/A'}</td>
+            </tr>
+          </table>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Libellé</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Quantité</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Unité</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Tarif</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Montant HT</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+          <div style="margin-top: 20px; font-weight: bold;">
+            <div>Total HT : ${totalHT.toFixed(2)} dh</div>
+            <div>Total TR : ${totalTR.toFixed(2)} dh</div>
+            <div>Total TVA : ${totalTVA.toFixed(2)} dh</div>
+            <div>Total TTC : ${totalTTC.toFixed(2)} dh</div>
+          </div>
+          <div style="font-size: 11px; margin-top: 20px;">
+            TOUS REGLEMENT EFFECTUE EN ESPECE EST SOUMIS AUX DROITS DE TIMBRE DE 0.25% DU MONTANT DE LA FACTURE.<br>
+            DIRECTION GEJ ERALE : LOT MAJ DAROJ A 300, LOT 8A SIDI MAAROUF, CASABLAJ CA<br>
+            ICE : 001612100000014 TEL : 050121314 - FAX : 0522786102 - IF : 1508000 - TP : 37998029
+          </div>
+        </div>
+      `;
+      setFactureHTML(html);
+      setShowFacturePreview(true);
+    };
 
   const navigate = useNavigate();
   const taxateurId = 1;
@@ -122,26 +206,44 @@ const chargerTousLesAgents = async () => {
 
 
   const traiterManifest = async () => {
-    try {
-      const payload = { ...traitementData, agentId: selectedAgentId };
-      const response = await fetch(`http://localhost:8080/api/taxateur/manifests/traiter?taxateurId=${taxateurId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        alert('Manifest traité avec succès !');
-        setShowTraitementModal(false);
-        chargerManifests();
-      } else {
-        const errorData = await response.text();
-        alert(`Erreur lors du traitement du manifest: ${errorData}`);
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert(`Erreur lors du traitement du manifest: ${error.message}`);
+  try {
+    if (!selectedManifest) return alert("Aucun manifest sélectionné");
+    if (!selectedAgentId) return alert("Veuillez sélectionner un agent");
+
+    // Construire le payload avec types corrects
+   const payload = {
+  manifestId: Number(traitementData.manifestId),
+  agentId: Number(selectedAgentId),
+  lignes: (traitementData.lignes || []).map(ligne => ({
+    id: Number(ligne.id),
+    montant: Number(ligne.montant) || 0
+  }))
+};
+
+
+    console.log("Payload envoyé:", payload); // Pour debug
+
+    const response = await fetch(`http://localhost:8080/api/taxateur/manifests/traiter?taxateurId=${taxateurId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      alert('Manifest traité avec succès !');
+      setShowTraitementModal(false);
+      chargerManifests(); // rafraîchir la liste
+    } else {
+      const errorData = await response.text();
+      alert(`Erreur lors du traitement du manifest: ${errorData}`);
     }
-  };
+
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert(`Erreur lors du traitement du manifest: ${error.message}`);
+  }
+};
+
 
   const telechargerFacture = async (factureId) => {
     try {
@@ -225,7 +327,7 @@ const chargerTousLesAgents = async () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{manifest.trafic || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
                   <button onClick={() => ouvrirModalTraitement(manifest)} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                    Traiter
+                    Générer la facture 
                   </button>
                 </td>
               </tr>
@@ -249,7 +351,7 @@ const chargerTousLesAgents = async () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date traitement</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaires</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -258,7 +360,11 @@ const chargerTousLesAgents = async () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{manifest.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(manifest.dateTraitement)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.montantTotal?.toLocaleString()} DH</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{manifest.commentairesTraitement || 'Aucun'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button onClick={() => { setSelectedManifest(manifest); setSelectedAgentId(manifest.agentId || null); imprimerFacture(); }} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    Générer la facture
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -268,7 +374,7 @@ const chargerTousLesAgents = async () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+  <div className="min-h-screen bg-gray-100">
       <aside className="fixed left-0 top-0 h-full w-64 bg-[#0071bc] text-white flex flex-col py-8 px-4 shadow-lg justify-between z-50">
         <div>
           <div className="mb-8 flex items-center space-x-3">
@@ -286,6 +392,16 @@ const chargerTousLesAgents = async () => {
       </aside>
 
       <main className="ml-64 p-10">
+        {showFacturePreview && (
+          <div className="mb-8 p-6 bg-white rounded-lg shadow border border-blue-500">
+            <h2 className="text-xl font-bold text-blue-700 mb-4">Prévisualisation de la facture</h2>
+            <div dangerouslySetInnerHTML={{ __html: factureHTML }} />
+            <div className="flex justify-end gap-4 mt-6">
+              <button onClick={() => { /* Accepter la facture, logique à ajouter */ setShowFacturePreview(false); }} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Accepter</button>
+              <button onClick={() => setShowFacturePreview(false)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Refuser</button>
+            </div>
+          </div>
+        )}
         {menu === 'dashboard' && (
           <div>
             <h1 className="text-3xl font-bold text-[#0071bc] mb-6">Bienvenue sur le Dashboard Taxateur</h1>
@@ -344,12 +460,8 @@ const chargerTousLesAgents = async () => {
           <div>
             <h2 className="text-2xl font-bold text-[#0071bc] mb-6">Gestion des Manifests</h2>
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Manifests en attente de traitement ({manifestsEnAttente.length})</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Manifests en attente de facturation ({manifestsEnAttente.length})</h3>
               {renderManifestsEnAttente()}
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Manifests traités ({manifestsTraites.length})</h3>
-              {renderManifestsTraites()}
             </div>
           </div>
         )}
@@ -432,10 +544,10 @@ const chargerTousLesAgents = async () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Traiter le manifest #{selectedManifest.id}</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Traiter le manifest {selectedManifest.id}</h3>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Agent (via escale)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Client </label>
                 <select
                   value={selectedAgentId ?? ''}
                   onChange={(e) => setSelectedAgentId(e.target.value ? Number(e.target.value) : null)}
@@ -452,75 +564,14 @@ const chargerTousLesAgents = async () => {
                   )}
                 </select>
               </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Commentaires</label>
-                <textarea
-                  value={traitementData.commentaires}
-                  onChange={(e) => setTraitementData({...traitementData, commentaires: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                  placeholder="Commentaires sur le traitement..."
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lignes de marchandises</label>
-                <div className="space-y-3">
-                  {traitementData.lignes.map((ligne, index) => (
-                    <div key={index} className="flex space-x-2">
-                      <div className="flex-1">
-                        <label className="block text-xs text-gray-600 mb-1">Tarif unitaire (DH/KG)</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={ligne.tarifUnitaire}
-                          onChange={(e) => {
-                            const newLignes = [...traitementData.lignes];
-                            newLignes[index].tarifUnitaire = parseFloat(e.target.value) || 0;
-                            setTraitementData({...traitementData, lignes: newLignes});
-                          }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs text-gray-600 mb-1">Unité</label>
-                        <input
-                          type="text"
-                          value={ligne.unite}
-                          onChange={(e) => {
-                            const newLignes = [...traitementData.lignes];
-                            newLignes[index].unite = e.target.value;
-                            setTraitementData({...traitementData, lignes: newLignes});
-                          }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Commentaire</label>
-                        <input
-                          type="text"
-                          value={ligne.commentaire}
-                          onChange={(e) => {
-                            const newLignes = [...traitementData.lignes];
-                            newLignes[index].commentaire = e.target.value;
-                            setTraitementData({...traitementData, lignes: newLignes});
-                          }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               <div className="flex justify-end space-x-3">
                 <button onClick={() => setShowTraitementModal(false)} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                   Annuler
                 </button>
-                <button onClick={traiterManifest} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Traiter et générer la facture
-                </button>
+                  <button onClick={imprimerFacture} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                  Voir facture
+                  </button>
+                
               </div>
             </div>
           </div>

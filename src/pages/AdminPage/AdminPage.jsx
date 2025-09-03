@@ -15,19 +15,19 @@ function AgentTable({ agents, onAccept, onReject }) {
       <table className="min-w-full bg-white text-black rounded shadow">
         <thead>
           <tr>
-            <th className="py-2 px-4 border-b">ID</th>          
-            <th className="py-2 px-4 border-b">Email</th>
-            <th className="py-2 px-4 border-b">Société</th>
-            <th className="py-2 px-4 border-b">Actions</th>
+            <th className="py-2 px-4 border-b text-center">ID</th>
+            <th className="py-2 px-4 border-b text-center">Email</th>
+            <th className="py-2 px-4 border-b text-center">Société</th>
+            <th className="py-2 px-4 border-b text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
         {agents.map(agent => (
   <tr key={agent.id} className="hover:bg-gray-100">
-    <td className="py-2 px-4 border-b">{agent.id}</td>
-    <td className="py-2 px-4 border-b">{agent.email}</td>
-    <td className="py-2 px-4 border-b">{agent.raisonSociale}</td>
-    <td className="py-2 px-4 border-b flex gap-2">
+    <td className="py-2 px-4 border-b text-center">{agent.id}</td>
+    <td className="py-2 px-4 border-b text-center">{agent.email}</td>
+    <td className="py-2 px-4 border-b text-center">{agent.raisonSociale}</td>
+    <td className="py-2 px-4 border-b flex gap-2 justify-center">
       <button
         className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
         onClick={() => onAccept(agent.id)}
