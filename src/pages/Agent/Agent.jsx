@@ -485,7 +485,7 @@ export default function AgentPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-900">Port de Casablanca</span>
-                    <span className="text-sm text-gray-500">{stats.facturesEnCours + stats.facturesPayees} manifests</span>
+                    <span className="text-sm text-gray-500">45 agents</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className="bg-blue-600 h-2 rounded-full" style={{width: '75%'}}></div>
@@ -493,23 +493,24 @@ export default function AgentPage() {
                   
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-900">Port de Tanger</span>
-                    <span className="text-sm text-gray-500">0 manifests</span>
+                    <span className="text-sm text-gray-500">32 agents</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full" style={{width: '0%'}}></div>
+                    <div className="bg-green-600 h-2 rounded-full" style={{width: '60%'}}></div>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-900">Port d'Agadir</span>
-                    <span className="text-sm text-gray-500">0 manifests</span>
+                    <span className="text-sm text-gray-500">28 agents</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-600 h-2 rounded-full" style={{width: '0%'}}></div>
+                    <div className="bg-purple-600 h-2 rounded-full" style={{width: '45%'}}></div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+         
         )}
 
         {menu === 'factures' && (

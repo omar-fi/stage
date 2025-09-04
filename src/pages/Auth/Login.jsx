@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import './AuthPage.css';
 import { useNavigate, Link, Routes } from 'react-router-dom';
 import Swal from 'sweetalert2';
+
+// Autres imports comme React, useState, etc.
 export default function Login() {
 
   
