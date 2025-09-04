@@ -21,8 +21,7 @@ export default function TaxateurPage() {
       alert('Erreur réseau lors de l\'envoi du mail.');
     }
   };
-
-
+ const [factureEnregistree, setFactureEnregistree] = useState(null);
   // Télécharge la facture affichée en PDF
   const telechargerFacturePDF = async () => {
     const factureDiv = document.getElementById('facture-preview-html');
