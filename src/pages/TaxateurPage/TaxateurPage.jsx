@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import jsPDF from 'jspdf';
+
 import html2canvas from 'html2canvas';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function TaxateurPage() {
   // Envoie la facture par mail à l'agent
@@ -62,102 +64,142 @@ const numeroFacture = genererNumeroFacture();
   const [selectedAgentId, setSelectedAgentId] = useState(null);
   const [showFacturePreview, setShowFacturePreview] = useState(false);
   const [factureHTML, setFactureHTML] = useState('');
+console.log("selectedManifest:", selectedManifest);
+console.log("selectedManifest.manifestLines:", selectedManifest?.manifestLines);
+console.log("traitementData.lignes:", traitementData.lignes);
 
-  // Génération du HTML de la facture au format ANP
-  const imprimerFacture = () => {
-    console.log("Selected Manifest :", selectedManifest);
+const imprimerFacture = async () => {
+  if (!selectedManifest || !selectedAgentId) {
+    alert("⚠️ Veuillez sélectionner un manifest et un agent.");
+    return;
+  }
 
-    if (!selectedManifest || !selectedAgentId) {
-      alert("Veuillez sélectionner un manifest et un agent.");
-      return;
-    }
-    setShowTraitementModal(false); // Fermer la modal dès qu'on affiche la facture
-    const agent = agentsEscale.find(a => a.id === selectedAgentId) || {};
-    const lignes = selectedManifest.manifestLines || [];
-    let totalHT = 0;
-    let totalTVA = 0;
-    let totalTR = 0;
-    const tauxTVA = 20;
-    const rows = lignes.map((l, idx) => {
-      const tarif = traitementData.lignes[idx]?.tarifUnitaire || 0;
-      const quantite = l.quantite || 1;
-      const montantHT = quantite * tarif;
-      const tva = montantHT * tauxTVA / 100;
-      totalHT += montantHT;
-      totalTVA += tva;
-      return `<tr>
-        <td>${l.code || ''}</td>
-        <td>${l.description || 'Marchandise'}</td>
-        <td>${quantite}</td>
-        <td>${l.unite || ''}</td>
-        <td>${tarif.toFixed(2)}</td>
-        <td>${montantHT.toFixed(2)}</td>
-        <td>${tauxTVA}</td>
-        <td>${tva.toFixed(2)}</td>
-        <td>${l.ancienIndex || ''}</td>
-        <td>${l.nouvelIndex || ''}</td>
-      </tr>`;
-    }).join('');
-    const totalTTC = totalHT + totalTVA + totalTR;
-    const html = `
-      <div style="font-family: Arial, sans-serif; margin: 40px;">
-        <div style="text-align: center;">
-          <div>ROYAUME DU MAROC<br>AGENCE NATIONALE DES PORTS</div>
-          <img src='/logo-anp.jpeg' style="height: 50px; margin-bottom: 10px; margin-left : 580px " alt="ANP" />
-        </div>
-        <div style="margin-bottom: 10px;text-align:center"><strong>N° Facture :</strong> ${numeroFacture}</div>
-        <div style="margin-bottom: 10px;text-align:center"><strong>Port :</strong> ${selectedManifest.port || 'N/A'}</div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <tr>
-            <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Date d'Emission</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Statut Facture</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Méthode de Paiement</th>
-          </tr>
-          
-          <tr>
-          <td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${new Date().toLocaleString('fr-FR')}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">Réglée</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">Espèce</td>
-          </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <tr>
-          <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Escale</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Navire</th>
-          </tr>
-          <tr>
-          </td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${selectedManifest.escaleId || 'N/A'}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${selectedManifest.navire|| 'N/A'}</td>
-          </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <tr>
-            <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Code Client</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Nom Client</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">ICE</th>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.id || 'N/A'}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.raisonSociale || agent.email || `Agent #${selectedAgentId}`}</td><td style="border: 1px solid #333; padding: 6px; font-size: 12px;">${agent.ice || 'N/A'}</td>
-          </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr>
-              <th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Libellé</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Quantité</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Unité</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Tarif</th><th style="border: 1px solid #333; padding: 6px; font-size: 12px;">Montant HT</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-        <div style="margin-top: 20px; font-weight: bold; margin-left : 540px">
-          <div>Total HT : ${totalHT.toFixed(2)} dh</div>
-          <div>Total TR : ${totalTR.toFixed(2)} dh</div>
-          <div>Total TVA : ${totalTVA.toFixed(2)} dh</div>
-          <div>Total TTC : ${totalTTC.toFixed(2)} dh</div>
-        </div>
-        <div style="font-size: 11px; margin-top: 20px; text-align: center;">
-          TOUS REGLEMENT EFFECTUE EN ESPECE EST SOUMIS AUX DROITS DE TIMBRE DE 0.25% DU MONTANT DE LA FACTURE.<br>
-          DIRECTION GEJ ERALE : LOT MAJ DAROJ A 300, LOT 8A SIDI MAAROUF, CASABLAJ CA<br>
-          ICE : 001612100000014 TEL : 050121314 - FAX : 0522786102 - IF : 1508000 - TP : 37998029
-        </div>
-      </div>
+  // 🔹 Récupérer les données depuis le backend
+  const response = await fetch(`http://localhost:8080/api/factures/calcule?agentId=${selectedAgentId}&manifesteId=${selectedManifest.id}`);
+  if (!response.ok) throw new Error("Erreur API calcul facture");
+  const factureData = await response.json();
+  
+
+  const lignes = factureData.lignes || [];
+  if (!lignes.length) {
+    alert("⚠️ Aucune ligne de manifeste à facturer !");
+    return;
+  }
+
+  // 🔹 Le reste du code pour générer le HTML
+  let totalHT = 0;
+  let totalTVA = 0;
+  const tauxTVA = 20;
+
+  const rows = lignes.map((l) => {
+    const quantite = l.quantite || 1;
+    
+
+
+    const tarif = l.tarifUnitaire || 0;
+    const montantHT = quantite * tarif;
+    const tva = montantHT * tauxTVA / 100;
+    totalHT += montantHT;
+    totalTVA += tva;
+
+    return `
+         <tr>
+        <td style="border: 1px solid #333; padding: 6px; word-break: break-word;">${l.libelleMH || 'Marchandise'}</td>
+        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${l.quantite}</td>
+        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${l.unite}</td>
+        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${l.tarifUnitaire.toFixed(2)}</td>
+        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${l.montantHT.toFixed(2)}</td>
+      </tr>
+
     `;
-    setFactureHTML(html);
-    setShowFacturePreview(true);
-  };
+  }).join('');
+const agent = agentsEscale.find(a => a.id === selectedAgentId) || {};
+const totalTR = factureData.totalTR || 0;
+  const totalTTC = totalHT + totalTVA + totalTR;
+
+  // 🔹 Génération HTML complet
+  const html = `
+    <div style="font-family: Arial, sans-serif; margin: 40px;">
+      <div style="text-align: center;">
+        <div>ROYAUME DU MAROC<br>AGENCE NATIONALE DES PORTS</div>
+        <img src='/logo-anp.jpeg' style="height: 50px; margin-bottom: 10px; margin-left: 580px;" alt="ANP" />
+      </div>
+      <div style="margin-bottom: 10px; text-align:center"><strong>N° Facture :</strong> ${numeroFacture}</div>
+      <div style="margin-bottom: 10px; text-align:center"><strong>Port :</strong> ${selectedManifest.port || 'N/A'}</div>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <tr>
+          <th style="border: 1px solid #333; padding: 6px;">Date d'Émission</th>
+          <th style="border: 1px solid #333; padding: 6px;">Statut Facture</th>
+          <th style="border: 1px solid #333; padding: 6px;">Méthode de Paiement</th>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #333; padding: 6px;">${new Date().toLocaleString('fr-FR')}</td>
+          <td style="border: 1px solid #333; padding: 6px;">Réglée</td>
+          <td style="border: 1px solid #333; padding: 6px;">Espèce</td>
+        </tr>
+      </table>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <tr>
+          <th style="border: 1px solid #333; padding: 6px;">Escale</th>
+          <th style="border: 1px solid #333; padding: 6px;">Navire</th>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #333; padding: 6px;">${selectedManifest.escaleId || 'N/A'}</td>
+          <td style="border: 1px solid #333; padding: 6px;">${selectedManifest.navire || 'N/A'}</td>
+        </tr>
+      </table>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <tr>
+          <th style="border: 1px solid #333; padding: 6px;">Code Client</th>
+          <th style="border: 1px solid #333; padding: 6px;">Nom Client</th>
+          <th style="border: 1px solid #333; padding: 6px;">ICE</th>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #333; padding: 6px;">${agent.id || 'N/A'}</td>
+          <td style="border: 1px solid #333; padding: 6px;">${agent.raisonSociale || agent.email || `Agent #${selectedAgentId}`}</td>
+          <td style="border: 1px solid #333; padding: 6px;">${agent.ice || 'N/A'}</td>
+        </tr>
+      </table>
+      
+ <table style="width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #333; padding: 6px; width: 45%; text-align: left;">Libellé</th>
+      <th style="border: 1px solid #333; padding: 6px; width: 15%; text-align: right;">Quantité</th>
+      <th style="border: 1px solid #333; padding: 6px; width: 10%; text-align: center;">Unité</th>
+      <td style="border: 1px solid #333; padding: 6px; text-align: center;">Tarif</th>
+      <th style="border: 1px solid #333; padding: 6px; width: 15%; text-align: right;">Montant HT</th>
+    </tr>
+  </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+      
+      <div style="margin-top: 20px; font-weight: bold; text-align: right;">
+        <div>Total HT : ${totalHT.toFixed(2)} DH</div>
+        <div>Total TR : ${totalTR.toFixed(2)} DH</div>
+        <div>Total TVA : ${totalTVA.toFixed(2)} DH</div>
+        <div>Total TTC : ${totalTTC.toFixed(2)} DH</div>
+      </div>
+      
+      <div style="font-size: 11px; margin-top: 20px; text-align: center;">
+        TOUS RÈGLEMENTS EFFECTUÉS EN ESPÈCES SONT SOUMIS AUX DROITS DE TIMBRE DE 0.25% DU MONTANT DE LA FACTURE.<br>
+        DIRECTION GÉNÉRALE : LOT MAJ DAROJ A 300, LOT 8A SIDI MAAROUF, CASABLANCA<br>
+        ICE : 001612100000014 — TEL : 050121314 — FAX : 0522786102 — IF : 1508000 — TP : 37998029
+      </div>
+    </div>
+  `;
+
+  // 🔹 Injecter dans la preview
+  setFactureHTML(html);
+  setShowFacturePreview(true);
+};
+
+
 
   const enregistrerFacture = async () => {
     if (!selectedManifest || !selectedAgentId) {
@@ -168,43 +210,57 @@ const numeroFacture = genererNumeroFacture();
     const agent = agentsEscale.find(a => a.id === selectedAgentId) || {};
     const lignes = selectedManifest.manifestLines || [];
 
-    const payload = {
-      manifestId: selectedManifest.id,
-      agentId: selectedAgentId,
-      lignes: lignes.map((l) => ({
-        manifestLineId: l.id,
-        quantite: l.quantite || 1,
-        libelle: l.description || 'Marchandise',
-        code: l.code || '',
-        unite: l.unite || 'KG',
-        poids: l.poids || 0,
-        volume: l.volume || 0,
-        categorie: l.categorie || ''
-      })),
-      dateEmission: new Date().toISOString(),
-      client: {
-        id: agent.id,
-        raisonSociale: agent.raisonSociale,
-        ice: agent.ice
-      }
+const payload = {
+  numeroFacture: numeroFacture,
+  dateEmission: new Date().toISOString(),
+  clientId: agent.id,
+  details: lignes.map((l, idx) => {
+    const tarif = traitementData.lignes[idx]?.tarifUnitaire || 0;
+    const quantite = l.quantite || 1;
+    return {
+      libelle: l.description || "Marchandise",
+      quantite: quantite,
+      unite: l.unite || "KG",
+      tarifUnitaire: tarif,
+      montantHT: quantite * tarif
     };
+  })
+};
 
-    try {
-      const response = await fetch('http://localhost:8080/api/factures', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
 
-      if (response.ok) {
-        alert('Facture enregistrée avec succès !');
-      } else {
-        const errorData = await response.text();
-        alert(`Erreur lors de l'enregistrement de la facture: ${errorData}`);
-      }
-    } catch (error) {
-      alert(`Erreur lors de l'enregistrement de la facture: ${error.message}`);
+
+const fetchTraitementData = async () => {
+  if (!selectedAgentId || !selectedManifest?.id) return;
+
+  try {
+    const url = `http://localhost:8080/api/factures/calcule?agentId=${selectedAgentId}&manifesteId=${selectedManifest.id}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!response.ok) {
+      throw new Error('Erreur lors du calcul de la facture');
     }
+
+    const data = await response.json();
+    console.log('Traitement Data reçu :', data);
+    setTraitementData(data); // met à jour ton state avec les tarifs
+  } catch (err) {
+    console.error(err);
+    alert('Impossible de récupérer les données du calcul de facture');
+  }
+};
+
+// 🔹 Ajoute ce useEffect juste ici
+useEffect(() => {
+  if(selectedManifest && selectedAgentId) {
+    fetchTraitementData();
+  }
+}, [selectedManifest, selectedAgentId]);
+
+
+
   };
 
   const navigate = useNavigate();
@@ -295,18 +351,20 @@ const numeroFacture = genererNumeroFacture();
   };
 
   const ouvrirModalTraitement = async (manifest) => {
+    console.log("Manifest sélectionné :", manifest);
     setSelectedManifest(manifest);
     await chargerTousLesAgents(); // <-- plus de escale
-    setTraitementData({
-      manifestId: manifest.id,
-      commentaires: '',
-      lignes: manifest.manifestLines?.map(line => ({
-        manifestLineId: line.id,
-        tarifUnitaire: 0,
-        unite: 'KG',
-        commentaire: ''
-      })) || []
-    });
+   setTraitementData({
+    manifestId: manifest.id,
+    commentaires: '',
+    lignes: manifest.manifestLines?.map(line => ({
+      manifestLineId: line.id,
+      tarifUnitaire: 0,
+      unite: 'KG',
+      commentaire: ''
+    })) || []
+  });
+
     setShowTraitementModal(true);
   };
 
